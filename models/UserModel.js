@@ -28,6 +28,9 @@ const UserSchema = mongoose.Schema(
       type: String,
       default: "online",
     },
+    picture: {
+      type: String,
+    },
   },
   {
     minimize: false,
