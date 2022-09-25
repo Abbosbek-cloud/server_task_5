@@ -19,7 +19,10 @@ const PORT = process.env.PORT || 5000;
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "https://abek-chat-app.netlify.app",
+    origin: [
+      "https://abek-chat-app.netlify.app",
+      "https://abek-chat.herokuapp.com",
+    ],
     methods: ["GET", "POST"],
   },
 });
