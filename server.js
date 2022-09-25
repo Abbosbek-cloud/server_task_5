@@ -24,8 +24,6 @@ const io = require("socket.io")(server, {
   },
 });
 
-let dat = 'curl "https://api.example.com/socket.io/?EIO=4&transport=polling"';
-let ap = "https://localhost:5000/socket.io/?EIO=4&transport=polling&t=ODomLlr.";
 app.get("/rooms", (req, res) => {
   res.json(rooms);
 });
@@ -68,7 +66,6 @@ io.on("connection", (socket) => {
 
   // sockets for sending messages
   socket.on("message-room", async (room, content, sender, time, date) => {
-    console.log(content);
     const newMessage = await MessageModel.create({
       content,
       from: sender,
@@ -77,12 +74,26 @@ io.on("connection", (socket) => {
       to: room,
     });
     let roomMessages = await getLastMessagesFromRoom(room);
-    console.log(roomMessages);
     roomMessages = sortMessagesByDate(roomMessages);
 
     // sends message to the room
     io.to(room).emit("room-messages", roomMessages);
     socket.broadcast.emit("notifications", room);
+  });
+
+  app.delete("/logout", async (req, res) => {
+    try {
+      const { _id, newMessages } = req.body;
+      const user = await User.findById(_id);
+      user.status = "offline";
+      user.newMessages = newMessages;
+      await user.save();
+      const members = await User.find();
+      socket.broadcast.emit("new-user", members);
+      res.status(200).send();
+    } catch (e) {
+      res.status(400).send();
+    }
   });
 });
 
