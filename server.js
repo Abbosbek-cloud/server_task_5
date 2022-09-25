@@ -22,6 +22,7 @@ const io = require("socket.io")(server, {
     origin: [
       "https://abek-chat-app.netlify.app",
       "https://abek-chat.herokuapp.com",
+      "http://localhost:3000",
     ],
     methods: ["GET", "POST"],
   },
