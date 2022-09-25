@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const userRouter = require("./routes/user/userRoutes");
 
-const rooms = ["general", "tech", "finance", "crypto"];
+const rooms = ["General", "Technology", "Finance", "Crypto"];
 const cors = require("cors");
 const MessageModel = require("./models/MessageModel");
 const User = require("./models/UserModel");
@@ -16,6 +16,7 @@ require("./connection");
 
 const server = require("http").createServer(app);
 const PORT = process.env.PORT || 5000;
+
 const io = require("socket.io")(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -23,6 +24,8 @@ const io = require("socket.io")(server, {
   },
 });
 
+let dat = 'curl "https://api.example.com/socket.io/?EIO=4&transport=polling"';
+let ap = "https://localhost:5000/socket.io/?EIO=4&transport=polling&t=ODomLlr.";
 app.get("/rooms", (req, res) => {
   res.json(rooms);
 });
