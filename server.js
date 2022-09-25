@@ -64,6 +64,7 @@ io.on("connection", (socket) => {
   socket.on("join-room", async (room) => {
     socket.join(room);
     let roomMessages = await getLastMessagesFromRoom(room);
+    console.log(roomMessages);
     roomMessages = sortMessagesByDate(roomMessages);
     socket.emit("room-messages", roomMessages);
   });
@@ -77,8 +78,9 @@ io.on("connection", (socket) => {
       date,
       to: room,
     });
+    const data = newMessage.save();
     let roomMessages = await getLastMessagesFromRoom(room);
-    roomMessages = sortMessagesByDate(roomMessages);
+    roomMessages = sortMessagesByDate(data);
 
     // sends message to the room
     io.to(room).emit("room-messages", roomMessages);
