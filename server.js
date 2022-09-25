@@ -4,6 +4,8 @@ const userRouter = require("./routes/user/userRoutes");
 
 const rooms = ["general", "tech", "finance", "crypto"];
 const cors = require("cors");
+const MessageModel = require("./models/MessageModel");
+const User = require("./models/UserModel");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -19,6 +21,47 @@ const io = require("socket.io")(server, {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
+});
+
+app.get("/rooms", (req, res) => {
+  res.json(rooms);
+});
+
+const getLastMessagesFromRoom = async (room) => {
+  let roomMessages = await MessageModel.aggregate([
+    { $match: { to: room } },
+    { $group: { _id: "$date", messageById: { $push: "$$ROOT" } } },
+  ]);
+
+  return roomMessages;
+};
+
+const sortMessagesByDate = (messages) => {
+  return messages.sort((a, b) => {
+    let date1 = a._id.split("/");
+    let date2 = b._id.split("/");
+
+    date1 = date1[2] + date1[0] + date1[1];
+    date1 = date2[2] + date2[0] + date2[1];
+
+    return date1 < date2 ? -1 : 1;
+  });
+};
+
+io.on("connection", (socket) => {
+  // socket for users
+  socket.on("new-user", async () => {
+    const members = await User.find();
+    io.emit("new-user", members);
+  });
+
+  // for meessages specific room
+  socket.on("join-room", async (room) => {
+    socket.join(room);
+    let roomMessages = await getLastMessagesFromRoom(room);
+    roomMessages = sortMessagesByDate(roomMessages);
+    socket.emit("room-messages", roomMessages);
+  });
 });
 
 server.listen(PORT, () => console.log("Listening to ", PORT));

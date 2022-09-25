@@ -1,14 +1,12 @@
 const mongoose = require("mongoose");
 
 const MessageSchema = mongoose.Schema({
-  message: {
-    type: String,
-    required: [true, "Message is required"],
-  },
-  userId: {
-    type: String,
-    required: [true, "UserId is required!"],
-  },
+  content: String,
+  from: String,
+  to: String,
+  socketId: String,
+  time: String,
+  date: String,
 });
 
 const MessageModel = mongoose.model("Message", MessageSchema);
