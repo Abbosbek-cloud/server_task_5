@@ -65,6 +65,25 @@ io.on("connection", (socket) => {
     roomMessages = sortMessagesByDate(roomMessages);
     socket.emit("room-messages", roomMessages);
   });
+
+  // sockets for sending messages
+  socket.on("message-room", async (room, content, sender, time, date) => {
+    console.log(content);
+    const newMessage = await MessageModel.create({
+      content,
+      from: sender,
+      time,
+      date,
+      to: room,
+    });
+    let roomMessages = await getLastMessagesFromRoom(room);
+    console.log(roomMessages);
+    roomMessages = sortMessagesByDate(roomMessages);
+
+    // sends message to the room
+    io.to(room).emit("room-messages", roomMessages);
+    socket.broadcast.emit("notifications", room);
+  });
 });
 
 server.listen(PORT, () => console.log("Listening to ", PORT));
