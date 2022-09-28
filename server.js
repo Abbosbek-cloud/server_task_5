@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 5000;
 const io = require("socket.io")(server, {
   cors: {
     origin: [
-      "https://abek-chat-app.netlify.app",
+      "https://itransition-task5-abek.netlify.app/",
       "https://abek-chat.herokuapp.com",
       "http://localhost:3000",
     ],
